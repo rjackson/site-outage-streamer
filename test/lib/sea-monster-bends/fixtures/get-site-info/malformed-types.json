@@ -1,0 +1,14 @@
+{
+  "id": "428871B4-AF50-4B0A-B92E-AAC493962BCB",
+  "name": 1,
+  "devices": [
+    {
+      "id": "341B3DA0-E5B4-42C6-9FBB-AC8ED929ACAE",
+      "name": "Really Big Heater"
+    },
+    {
+      "id": "376B452D-841F-4FD7-A9EC-25B865C47E99",
+      "name": "Equally Large Air Conditioner"
+    }
+  ]
+}
