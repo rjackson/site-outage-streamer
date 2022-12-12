@@ -25,4 +25,19 @@ export default class Base {
         this.baseUrl = baseUrl;
         this.apiKey = apiKey;
     }
+
+    request(resource: string, init?: RequestInit): Promise<Response> {
+        const url = new URL(resource, this.baseUrl);
+
+        return fetch(
+            url.toString(), // jest-fetch-mock doesn't like raw URL objects?
+            {
+                ...init,
+                headers: {
+                    ...init?.headers,
+                    "Api-Key": this.apiKey
+                }
+            }
+        );
+    }
 }
