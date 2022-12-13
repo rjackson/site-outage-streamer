@@ -1,9 +1,20 @@
 import SeaMonsterBends from "./lib/sea-monster-bends";
 import { Outage } from "./lib/sea-monster-bends/get-outages";
 import { SiteOutageDetails } from "./lib/sea-monster-bends/post-site-outage";
+import outageWithinDates from "./predicates/outage-within-dates";
 import buildDeviceLookupMap, { DeviceLookupDetails } from "./util/build-device-lookup-map";
 
 export interface MigrateOutagesOptions {
+    /**
+     * Do not migrate outages that occured before this date
+     */
+    from?: string
+
+    /**
+     * Do not migrate outages that occured after this date
+     */
+    to?: string
+
     /**
      * Custom SeaMonsterBends client. Will be initialised from environmental variables if not provided.
      */
@@ -40,7 +51,8 @@ const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => 
     const outages = await client.getOutages();
 
     const filteredOutages = outages.filter((outage) => {
-        return deviceLookupMap.has(outage.id);
+        return deviceLookupMap.has(outage.id) &&
+            outageWithinDates(outage, options?.from, options?.to);
     });
 
     const siteOutageSubmissions = await Promise.allSettled(filteredOutages.map(async (outage) => {

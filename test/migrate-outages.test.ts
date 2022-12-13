@@ -140,3 +140,142 @@ describe("site argument", () => {
         ]);
     });
 });
+
+describe("date filtering", () => {
+    test("don't migrate anything if there are no outages within the date range", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], {
+            ...migrateOutagesOptions,
+            from: "2022-12-31T00:00:00.000Z",
+            to: "2022-12-31T23:59:59.000Z"
+        });
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.getOutages).toHaveBeenCalled();
+        expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).not.toHaveBeenCalled();
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(0);
+    });
+
+    test("migrate outages after the from date only", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], {
+            ...migrateOutagesOptions,
+            from: "2022-12-02T01:02:03.123Z"
+        });
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.getOutages).toHaveBeenCalled();
+        expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            1,
+            "test-site-many-devices",
+            siteOutageAirCon
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            2,
+            "test-site-one-device",
+            siteOutageReasonableMicrowave
+        );
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(2);
+        expect(siteOutageDetailsList).toEqual([
+            siteOutageAirCon,
+            siteOutageReasonableMicrowave
+        ]);
+    });
+
+    test("migrate outages before the to date only", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], {
+            ...migrateOutagesOptions,
+            to: "2022-12-02T23:59:59.123Z"
+        });
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.getOutages).toHaveBeenCalled();
+        expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            1,
+            "test-site-many-devices",
+            siteOutageReallyBigHeater
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            2,
+            "test-site-many-devices",
+            siteOutageAirCon
+        );
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(2);
+        expect(siteOutageDetailsList).toEqual([
+            siteOutageReallyBigHeater,
+            siteOutageAirCon
+        ]);
+    });
+
+    test("migrate outages within the from and to dates", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], {
+            ...migrateOutagesOptions,
+            from: "2022-12-02T01:02:03.123Z",
+            to: "2022-12-02T23:59:59.123Z",
+        });
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.getOutages).toHaveBeenCalled();
+        expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(1);
+        expect(smb.postSiteOutage).toHaveBeenCalledWith<[string, SiteOutageDetails]>(
+            "test-site-many-devices",
+            siteOutageAirCon
+        );
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(1);
+        expect(siteOutageDetailsList).toEqual([
+            siteOutageAirCon,
+        ]);
+    });
+});
