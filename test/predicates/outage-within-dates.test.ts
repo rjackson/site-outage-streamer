@@ -1,5 +1,5 @@
 import outageWithinDates from "../../src/predicates/outage-within-dates";
-import outagesValid from "../lib/sea-monster-bends/fixtures/get-outages/valid.json";
+import outagesValid from "../fixtures/outages/valid.json";
 
 test("all outages pass if no dates are given", () => {
     outagesValid.forEach(outage => {

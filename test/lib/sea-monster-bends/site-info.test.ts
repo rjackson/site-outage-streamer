@@ -1,10 +1,10 @@
 import SeaMonsterBends from "../../../src/lib/sea-monster-bends";
 import fetchMock from "jest-fetch-mock";
-import siteInfoValidWithDevices from "./fixtures/get-site-info/valid.json";
-import siteInfoValidwithoutDevices from "./fixtures/get-site-info/valid-no-devices.json";
-import siteInfoMalformedTypes from "./fixtures/get-site-info/malformed-types.json";
-import siteInfoMissingProperty from "./fixtures/get-site-info/missing-properties.json";
-import errorJson from "./fixtures/error.json";
+import siteInfoValidWithDevices from "../../fixtures/site-info/valid.json";
+import siteInfoValidwithoutDevices from "../../fixtures/site-info/valid-no-devices.json";
+import siteInfoMalformedTypes from "../../fixtures/site-info/malformed-types.json";
+import siteInfoMissingProperty from "../../fixtures/site-info/missing-properties.json";
+import errorJson from "../../fixtures/generic/error.json";
 
 const smb = new SeaMonsterBends({
     baseUrl: "http://example.com",

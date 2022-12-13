@@ -1,6 +1,6 @@
 import SeaMonsterBends from "../../../src/lib/sea-monster-bends";
 import fetchMock from "jest-fetch-mock";
-import validSiteOutage from "./fixtures/post-site-outage/valid.json";
+import validSiteOutage from "../../fixtures/site-outage-details/valid.json";
 
 const smb = new SeaMonsterBends({
     baseUrl: "http://example.com",

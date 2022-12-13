@@ -1,9 +1,9 @@
 import SeaMonsterBends from "../../../src/lib/sea-monster-bends";
 import fetchMock from "jest-fetch-mock";
-import outagesValid from "./fixtures/get-outages/valid.json";
-import outagesMalformedTypes from "./fixtures/get-outages/malformed-types.json";
-import outagesMissingProperty from "./fixtures/get-outages/missing-properties.json";
-import errorJson from "./fixtures/error.json";
+import outagesValid from "../../fixtures/outages/valid.json";
+import outagesMalformedTypes from "../../fixtures/outages/malformed-types.json";
+import outagesMissingProperty from "../../fixtures/outages/missing-properties.json";
+import errorJson from "../../fixtures/generic/error.json";
 
 const smb = new SeaMonsterBends({
     baseUrl: "http://example.com",
