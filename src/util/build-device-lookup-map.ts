@@ -14,17 +14,13 @@ export type DeviceLookupDetails = {
 
 type DeviceLookupMapEntry = [DeviceId, DeviceLookupDetails]
 
-const siteToDeviceLookupMapEntries: (site: SiteInfo) => DeviceLookupMapEntry[] =
-    ({ id: siteId, name: siteName, devices }) => devices.map(
-        ({ id: deviceId, name: deviceName }) => ([
-            (deviceId as DeviceId),
-            ({
-                deviceId,
-                deviceName,
-                siteId,
-                siteName
-            } as DeviceLookupDetails)
-        ]));
+const siteToDeviceLookupMapEntries: (site: SiteInfo) => DeviceLookupMapEntry[] = (site) => {
+    const { id: siteId, name: siteName, devices } = site;
+    return devices.map((device) => {
+        const { id: deviceId, name: deviceName } = device;
+        return [deviceId, { deviceId, deviceName, siteId, siteName }];
+    });
+};
 
 export type DeviceLookupMap = Map<DeviceId, DeviceLookupDetails>
 

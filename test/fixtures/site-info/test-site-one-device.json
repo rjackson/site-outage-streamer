@@ -1,0 +1,10 @@
+{
+  "id": "test-site-one-device",
+  "name": "Test Site One Device",
+  "devices": [
+    {
+      "id": "1566D166-1425-4F08-96A7-ADD1688F8893",
+      "name": "A Reasonable Microwave"
+    }
+  ]
+}
