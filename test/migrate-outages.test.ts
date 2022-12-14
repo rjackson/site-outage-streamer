@@ -279,3 +279,121 @@ describe("date filtering", () => {
         ]);
     });
 });
+
+describe("error handling", () => {
+    test("Failing to load at least one site info throws error", () => {
+        const t = async () => {
+            smb.getOutages.mockResolvedValue(outagesValid);
+            smb.getSiteInfo
+                .mockResolvedValueOnce(siteInfoNoDevices)
+                .mockRejectedValueOnce(new Error("Could not load site outage"))
+                .mockResolvedValueOnce(siteInfoManyDevices);
+
+            await migrateOutages([
+                "test-site-no-device",
+                "test-site-one-device",
+                "test-site-many-devices"
+            ], migrateOutagesOptions);
+        };
+
+        expect(t).rejects.toThrow(new Error("Could not load site outage"));
+    });
+
+    test("Failing to load outages throws error", () => {
+        const t = async () => {
+            smb.getOutages.mockRejectedValue(new Error("Could not load site outage"));
+            smb.getSiteInfo
+                .mockResolvedValueOnce(siteInfoNoDevices)
+                .mockResolvedValueOnce(siteInfoOneDevice)
+                .mockResolvedValueOnce(siteInfoManyDevices);
+
+            await migrateOutages([
+                "test-site-no-device",
+                "test-site-one-device",
+                "test-site-many-devices"
+            ], migrateOutagesOptions);
+        };
+
+        expect(t).rejects.toThrow(new Error("Could not load site outage"));
+    });
+
+    test("No site outages are returned if they failed to POST", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+        smb.postSiteOutage
+            .mockRejectedValue(new Error("Gremlins have chewed the wires"));
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], migrateOutagesOptions);
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            1,
+            "test-site-many-devices",
+            siteOutageReallyBigHeater
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            2,
+            "test-site-many-devices",
+            siteOutageAirCon
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            3,
+            "test-site-one-device",
+            siteOutageReasonableMicrowave
+        );
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(0);
+    });
+
+    test("One site outages is ommitted from the return array if it failed post", async () => {
+        smb.getOutages.mockResolvedValue(outagesValid);
+        smb.getSiteInfo
+            .mockResolvedValueOnce(siteInfoNoDevices)
+            .mockResolvedValueOnce(siteInfoOneDevice)
+            .mockResolvedValueOnce(siteInfoManyDevices);
+        smb.postSiteOutage
+            .mockResolvedValueOnce()
+            .mockRejectedValueOnce(new Error("Gremlins have chewed the wires"))
+            .mockResolvedValueOnce();
+
+        const siteOutageDetailsList = await migrateOutages([
+            "test-site-no-device",
+            "test-site-one-device",
+            "test-site-many-devices"
+        ], migrateOutagesOptions);
+
+        // We submitted relevant outages to postSiteOutage
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(3);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            1,
+            "test-site-many-devices",
+            siteOutageReallyBigHeater
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            2,
+            "test-site-many-devices",
+            siteOutageAirCon
+        );
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+            3,
+            "test-site-one-device",
+            siteOutageReasonableMicrowave
+        );
+
+        // We'll return the details we managed to post
+        expect(siteOutageDetailsList).toHaveLength(2);
+        expect(siteOutageDetailsList).toEqual([
+            siteOutageReallyBigHeater,
+            siteOutageReasonableMicrowave
+        ]);
+    });
+});
