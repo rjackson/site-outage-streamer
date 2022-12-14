@@ -35,7 +35,7 @@ export default class Base {
                 ...init,
                 headers: {
                     ...init?.headers,
-                    "Api-Key": this.apiKey
+                    "x-api-key": this.apiKey
                 }
             }
         );
