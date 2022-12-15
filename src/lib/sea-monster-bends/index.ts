@@ -6,7 +6,7 @@ import postSiteOutage, { SiteOutageDetails } from "./post-site-outage";
 interface SeaMonsterBends {
     getOutages(this: Base): Promise<Outage[]>
     getSiteInfo(this: Base, id: string): Promise<SiteInfo>
-    postSiteOutage(this: Base, siteId: string, siteOutageDetails: SiteOutageDetails): Promise<void>
+    postSiteOutage(this: Base, siteId: string, siteOutageDetailsList: SiteOutageDetails[]): Promise<void>
 }
 
 class SeaMonsterBends extends Base { }

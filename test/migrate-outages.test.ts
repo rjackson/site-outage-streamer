@@ -58,10 +58,10 @@ describe("site argument", () => {
 
         // We submitted relevant outages to postSiteOutage
         expect(smb.postSiteOutage).toHaveBeenCalledTimes(1);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             1,
             "test-site-one-device",
-            siteOutageReasonableMicrowave
+            [siteOutageReasonableMicrowave]
         );
 
         // We'll return the details we managed to post
@@ -80,16 +80,13 @@ describe("site argument", () => {
         ], migrateOutagesOptions);
 
         // We submitted relevant outages to postSiteOutage
-        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            1,
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(1);
+        expect(smb.postSiteOutage).toHaveBeenCalledWith<[string, SiteOutageDetails[]]>(
             "test-site-many-devices",
-            siteOutageReallyBigHeater
-        );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            2,
-            "test-site-many-devices",
-            siteOutageAirCon
+            [
+                siteOutageReallyBigHeater,
+                siteOutageAirCon
+            ]
         );
 
         // We'll return the details we managed to post
@@ -114,21 +111,19 @@ describe("site argument", () => {
         ], migrateOutagesOptions);
 
         // We submitted relevant outages to postSiteOutage
-        expect(smb.postSiteOutage).toHaveBeenCalledTimes(3);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             1,
             "test-site-many-devices",
-            siteOutageReallyBigHeater
+            [
+                siteOutageReallyBigHeater,
+                siteOutageAirCon
+            ]
         );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             2,
-            "test-site-many-devices",
-            siteOutageAirCon
-        );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            3,
             "test-site-one-device",
-            siteOutageReasonableMicrowave
+            [siteOutageReasonableMicrowave]
         );
 
         // We'll return the details we managed to post
@@ -188,15 +183,15 @@ describe("date filtering", () => {
         expect(smb.getOutages).toHaveBeenCalled();
         expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
         expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             1,
             "test-site-many-devices",
-            siteOutageAirCon
+            [siteOutageAirCon]
         );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             2,
             "test-site-one-device",
-            siteOutageReasonableMicrowave
+            [siteOutageReasonableMicrowave]
         );
 
         // We'll return the details we managed to post
@@ -226,16 +221,13 @@ describe("date filtering", () => {
         // We submitted relevant outages to postSiteOutage
         expect(smb.getOutages).toHaveBeenCalled();
         expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
-        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            1,
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(1);
+        expect(smb.postSiteOutage).toHaveBeenCalledWith<[string, SiteOutageDetails[]]>(
             "test-site-many-devices",
-            siteOutageReallyBigHeater
-        );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            2,
-            "test-site-many-devices",
-            siteOutageAirCon
+            [
+                siteOutageReallyBigHeater,
+                siteOutageAirCon
+            ]
         );
 
         // We'll return the details we managed to post
@@ -267,9 +259,9 @@ describe("date filtering", () => {
         expect(smb.getOutages).toHaveBeenCalled();
         expect(smb.getSiteInfo).toHaveBeenCalledTimes(3);
         expect(smb.postSiteOutage).toHaveBeenCalledTimes(1);
-        expect(smb.postSiteOutage).toHaveBeenCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenCalledWith<[string, SiteOutageDetails[]]>(
             "test-site-many-devices",
-            siteOutageAirCon
+            [siteOutageAirCon]
         );
 
         // We'll return the details we managed to post
@@ -333,21 +325,19 @@ describe("error handling", () => {
         ], migrateOutagesOptions);
 
         // We submitted relevant outages to postSiteOutage
-        expect(smb.postSiteOutage).toHaveBeenCalledTimes(3);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             1,
             "test-site-many-devices",
-            siteOutageReallyBigHeater
+            [
+                siteOutageReallyBigHeater,
+                siteOutageAirCon
+            ]
         );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             2,
-            "test-site-many-devices",
-            siteOutageAirCon
-        );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            3,
             "test-site-one-device",
-            siteOutageReasonableMicrowave
+            [siteOutageReasonableMicrowave]
         );
 
         // We'll return the details we managed to post
@@ -362,8 +352,7 @@ describe("error handling", () => {
             .mockResolvedValueOnce(siteInfoManyDevices);
         smb.postSiteOutage
             .mockResolvedValueOnce()
-            .mockRejectedValueOnce(new Error("Gremlins have chewed the wires"))
-            .mockResolvedValueOnce();
+            .mockRejectedValueOnce(new Error("Gremlins have chewed the wires"));
 
         const siteOutageDetailsList = await migrateOutages([
             "test-site-no-device",
@@ -372,28 +361,26 @@ describe("error handling", () => {
         ], migrateOutagesOptions);
 
         // We submitted relevant outages to postSiteOutage
-        expect(smb.postSiteOutage).toHaveBeenCalledTimes(3);
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenCalledTimes(2);
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             1,
             "test-site-many-devices",
-            siteOutageReallyBigHeater
+            [
+                siteOutageReallyBigHeater,
+                siteOutageAirCon
+            ]
         );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
+        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails[]]>(
             2,
-            "test-site-many-devices",
-            siteOutageAirCon
-        );
-        expect(smb.postSiteOutage).toHaveBeenNthCalledWith<[string, SiteOutageDetails]>(
-            3,
             "test-site-one-device",
-            siteOutageReasonableMicrowave
+            [siteOutageReasonableMicrowave]
         );
 
         // We'll return the details we managed to post
         expect(siteOutageDetailsList).toHaveLength(2);
         expect(siteOutageDetailsList).toEqual([
             siteOutageReallyBigHeater,
-            siteOutageReasonableMicrowave
+            siteOutageAirCon
         ]);
     });
 });

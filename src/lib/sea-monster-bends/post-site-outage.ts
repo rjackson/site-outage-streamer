@@ -23,13 +23,13 @@ export interface SiteOutageDetails {
     name: string;
 }
 
-async function postSiteOutage(this: Base, siteId: string, outageDetails: SiteOutageDetails): Promise<void> {
+async function postSiteOutage(this: Base, siteId: string, outageDetailsList: SiteOutageDetails[]): Promise<void> {
     const response = await this.request(`site-outages/${siteId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(outageDetails),
+        body: JSON.stringify(outageDetailsList),
     });
 
     if (!response.ok) {

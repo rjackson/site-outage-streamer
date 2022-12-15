@@ -40,7 +40,7 @@ const buildSiteOutage: (outage: Outage, deviceDetails: DeviceLookupDetails) => S
  */
 const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => Promise<SiteOutageDetails[]> = async (siteNames, options) => {
     const client = options?.client ?? new SeaMonsterBends();
-    const sites = await Promise.all(siteNames.map(client.getSiteInfo));
+    const sites = await Promise.all(siteNames.map(siteName => client.getSiteInfo(siteName)));
     const deviceLookupMap = buildDeviceLookupMap(sites);
 
     // No sites or devices that warrant forwarding outages about.
@@ -55,24 +55,38 @@ const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => 
             outageWithinDates(outage, options?.from, options?.to);
     });
 
-    const siteOutageSubmissions = await Promise.allSettled(filteredOutages.map(async (outage) => {
+    const outagesDetailsBySite = filteredOutages.reduce((outagesDetailsBySite, outage) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const deviceDetails = deviceLookupMap.get(outage.id)!;
         const siteOutageDetails = buildSiteOutage(outage, deviceDetails);
 
-        try {
-            await client.postSiteOutage(deviceDetails.siteId, siteOutageDetails);
-        } catch (e) {
-            // TODO: Opportunity for error handling, if there's anything we want to do here?
-            throw e;
-        }
+        const { siteId } = deviceDetails;
+        outagesDetailsBySite.set(siteId,
+            [
+                ...outagesDetailsBySite.get(siteId) ?? [],
+                siteOutageDetails
+            ]
+        );
 
-        return siteOutageDetails;
-    }));
+        return outagesDetailsBySite;
+    }, new Map<string, SiteOutageDetails[]>);
+
+    const siteOutageSubmissions = await Promise.allSettled(
+        Array.from(outagesDetailsBySite.entries()).map(async ([siteId, siteOutageDetailsList]) => {
+            try {
+                await client.postSiteOutage(siteId, siteOutageDetailsList);
+            } catch (e) {
+                // TODO: Opportunity for error handling, if there's anything we want to do here?
+                throw e;
+            }
+
+            return siteOutageDetailsList;
+        })
+    );
 
     return siteOutageSubmissions
         .filter(({ status }) => status == "fulfilled")
-        .map((result) => (result as PromiseFulfilledResult<SiteOutageDetails>).value);
+        .flatMap((result) => (result as PromiseFulfilledResult<SiteOutageDetails[]>).value);
 };
 
 export default migrateOutages;
