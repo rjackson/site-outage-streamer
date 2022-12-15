@@ -12,6 +12,8 @@ export interface Options {
     apiKey?: string;
 }
 
+export const MISSING_CREDENTIALS_ERROR_MSG = "Missing credentials for Sea Monster Bends API";
+
 export default class Base {
     baseUrl: string;
     apiKey: string;
@@ -21,7 +23,7 @@ export default class Base {
         const apiKey = options?.apiKey ?? process.env.SMB_API_KEY;
 
         if (!baseUrl || !apiKey) {
-            throw new Error("Missing credentials for Sea Monster Bends API");
+            throw new Error(MISSING_CREDENTIALS_ERROR_MSG);
         }
 
         this.baseUrl = baseUrl;

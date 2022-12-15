@@ -27,10 +27,16 @@ const isSiteInfo = (variableToCheck: unknown): variableToCheck is SiteInfo => {
         (variableToCheck as SiteInfo).devices.every(device => isDevice(device));
 };
 
+export const SITE_NOT_FOUND_ERROR_MSG = "Site Info API: Site not found";
+
 async function getSiteInfo(this: Base, id: string): Promise<SiteInfo> {
     const response = await this.request(`site-info/${id}`);
 
     const data: unknown = response.headers.get("Content-Type") === "application/json" ? await response.json() : null;
+
+    if (response.status == 404) {
+        throw new Error(SITE_NOT_FOUND_ERROR_MSG);
+    }
 
     if (!response.ok) {
         throw new Error("Unexpected response from Site Info API: " + ((data as Error)?.message ?? response.status));

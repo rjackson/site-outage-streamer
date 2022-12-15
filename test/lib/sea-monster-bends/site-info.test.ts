@@ -92,5 +92,5 @@ test("should throw error on HTTP errors (without json error)", async () => {
     });
 
     expect(smb.getSiteInfo("blah")).rejects.toThrow(Error);
-    expect(smb.getSiteInfo("blah")).rejects.toThrow("Unexpected response from Site Info API: 404");
+    expect(smb.getSiteInfo("blah")).rejects.toThrow("Site Info API: Site not found");
 });
