@@ -47,6 +47,7 @@ Options:
   --api-key <apiKey>        API Key for the Sea Monster Bends API. If not set,
                             will attempt to load SMB_API_KEY environmental
                             variable.
+  -v, --verbose             Enable verbose logging (default: false)
   -h, --help                display help for command
 ```
 
