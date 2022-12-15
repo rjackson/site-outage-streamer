@@ -1,13 +1,15 @@
 import { Command } from "@commander-js/extra-typings";
+import winston from "winston";
 import SeaMonsterBends from "./lib/sea-monster-bends";
 import migrateOutages from "./migrate-outages";
 
 interface CliOptions {
     site: string[];
-    from?: string | undefined;
-    to?: string | undefined;
-    apiBaseUrl?: string | undefined;
-    apiKey?: string | undefined;
+    from?: string;
+    to?: string;
+    apiBaseUrl?: string;
+    apiKey?: string;
+    verbose: boolean;
 }
 
 const run = async (options: CliOptions) => {
@@ -16,10 +18,17 @@ const run = async (options: CliOptions) => {
         from,
         to,
         apiBaseUrl,
-        apiKey
+        apiKey,
+        verbose
     } = options;
 
     try {
+        winston.configure({
+            level: verbose ? "verbose" : "info",
+            format: winston.format.combine(winston.format.splat(), winston.format.cli()),
+            transports: [new winston.transports.Console({})],
+        });
+
         const client = apiBaseUrl || apiKey ?
             new SeaMonsterBends({
                 baseUrl: apiBaseUrl,
@@ -36,7 +45,7 @@ const run = async (options: CliOptions) => {
             }
         );
 
-        console.log(`Successfully forwarded ${migratedSiteOutages.length} outages`);
+        winston.info(`Successfully forwarded ${migratedSiteOutages.length} outages`);
 
     } catch (e) {
         // Missing credentials
@@ -55,6 +64,7 @@ const program = new Command()
     .option("-t, --to <to>", "Ignore outages after this date")
     .option("--api-base-url <baseUrl>", "Base URL for the Sea Monster Bends API. If not set, will attempt to load SMB_BASE_URL environmental variable.")
     .option("--api-key <apiKey>", "API Key for the Sea Monster Bends API. If not set, will attempt to load SMB_API_KEY environmental variable.")
+    .option("-v, --verbose", "Enable verbose logging", false)
     .showHelpAfterError()
     .action(run);
 

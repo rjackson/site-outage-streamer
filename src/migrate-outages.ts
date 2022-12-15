@@ -1,3 +1,4 @@
+import winston from "winston";
 import SeaMonsterBends from "./lib/sea-monster-bends";
 import { Outage } from "./lib/sea-monster-bends/get-outages";
 import { SiteOutageDetails } from "./lib/sea-monster-bends/post-site-outage";
@@ -45,14 +46,26 @@ const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => 
 
     // No sites or devices that warrant forwarding outages about.
     if (deviceLookupMap.size == 0) {
+        winston.warn("There are no devices at the given sites, and therefore no outages to forward.");
         return [];
     }
 
     const outages = await client.getOutages();
+    winston.info(`Loaded ${outages.length} outages to parse`);
 
     const filteredOutages = outages.filter((outage) => {
-        return deviceLookupMap.has(outage.id) &&
-            outageWithinDates(outage, options?.from, options?.to);
+        if (!deviceLookupMap.has(outage.id)) {
+            winston.verbose(`Outage ${outage.id}: Not forwarding as it is unrelated to our site's devices.`);
+            return false;
+        }
+
+        if (!outageWithinDates(outage, options?.from, options?.to)) {
+            winston.verbose(`Outage ${outage.id}: Not forwarding as it is occured beyond the outage dates we're forwarding.`);
+            return false;
+        }
+
+        winston.verbose(`Outage ${outage.id}: Eligible to forward`);
+        return true;
     });
 
     const outagesDetailsBySite = filteredOutages.reduce((outagesDetailsBySite, outage) => {
@@ -67,6 +80,7 @@ const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => 
                 siteOutageDetails
             ]
         );
+        winston.verbose(`Outage ${outage.id} belongs to site ${siteId}`);
 
         return outagesDetailsBySite;
     }, new Map<string, SiteOutageDetails[]>);
@@ -75,7 +89,10 @@ const migrateOutages: (siteNames: string[], options?: MigrateOutagesOptions) => 
         Array.from(outagesDetailsBySite.entries()).map(async ([siteId, siteOutageDetailsList]) => {
             try {
                 await client.postSiteOutage(siteId, siteOutageDetailsList);
+                winston.info(`Forwarded ${siteOutageDetailsList.length} outages to site ${siteId}`);
             } catch (e) {
+                winston.error(`Error occured when forwarding ${siteOutageDetailsList.length} outages to site ${siteId}. Error details: ${e}`);
+
                 // TODO: Opportunity for error handling, if there's anything we want to do here?
                 throw e;
             }

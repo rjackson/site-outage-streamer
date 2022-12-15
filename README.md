@@ -63,7 +63,10 @@ node dist/cli.js \
 Example output:
 
 ```txt
-Successfully forwarded 4 outages
+info:    Loaded 23 outages to parse
+info:    Forwarded 4 outages to site very-unreliable-place
+info:    Forwarded 1 outages to site slightly-more-reliable-place
+info:    Successfully forwarded 5 outages
 ```
 
 ### Satisfying technical test requirements
@@ -91,5 +94,7 @@ node dist/cli.js \
 Output:
 
 ```txt
-Successfully forwarded 10 outages
+info:    Loaded 108 outages to parse
+info:    Forwarded 10 outages to site norwich-pear-tree
+info:    Successfully forwarded 10 outages
 ```
