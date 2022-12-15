@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@types/jest": "^29.2.4",
+    "@types/node-fetch": "^2.6.2",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",
     "eslint": "^8.29.0",
@@ -17,5 +18,8 @@
     "test": "jest",
     "watch-test": "npm run test -- --watchAll",
     "watch-ts": "tsc -w"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
   }
 }

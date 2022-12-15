@@ -27,18 +27,20 @@ test("should merge request options correctly", () => {
     fetchMock.doMock();
 
     smb.request("test-endpoint", {
-        credentials: "include",
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify("Hello world")
     });
 
     expect(fetchMock.mock.lastCall?.[0]).toEqual("http://example.com/test-endpoint");
     expect(fetchMock.mock.lastCall?.[1]).toMatchObject({
-        credentials: "include",
+        method: "PATCH",
         headers: {
             "x-api-key": "smbApiKey123",
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify("Hello world")
     });
 });

@@ -1,3 +1,5 @@
+import fetch, { RequestInit, Response } from "node-fetch";
+
 export interface Options {
     /**
      * API's base URL. If not set, will be loaded from SMB_BASE_URL environmental variable.
