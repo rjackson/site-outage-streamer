@@ -32,22 +32,64 @@ npm install
 
 ## Usage
 
-For a one-off bulk migration of outages to site-specific endpoints, you can use `dist/migrate-outages`.
-
-Usage:
+For a one-off bulk migration of outages to site-specific endpoints, you can use `dist/cli.js`.
 
 ```txt
-(todo)
+Usage: cli [options]
+
+Options:
+  -s, --site <site...>      Sites whose outages we wish to publish
+  -f, --from <from>         Ignore outages before this date
+  -t, --to <to>             Ignore outages after this date
+  --api-base-url <baseUrl>  Base URL for the Sea Monster Bends API. If not set,
+                            will attempt to load SMB_BASE_URL environmental
+                            variable.
+  --api-key <apiKey>        API Key for the Sea Monster Bends API. If not set,
+                            will attempt to load SMB_API_KEY environmental
+                            variable.
+  -h, --help                display help for command
 ```
 
 For example, to migrate all outages in July 2022 for 2 sites:
 
 ```sh
-node dist/migrate-outages --site very-unreliable-place --site slightly-more-reliable-place --from 2022-07-01 --to 2022-07-31
+node dist/cli.js \
+   --site very-unreliable-place \
+   --site slightly-more-reliable-place \
+   --from 2022-07-01 \
+   --to 2022-07-31
 ```
 
 Example output:
 
 ```txt
-(todo)
+Successfully forwarded 4 outages
+```
+
+### Satisfying technical test requirements
+
+To fulfil the technical test's exact requirements, there are 2 constraints to apply:
+
+- Sites: `norwich-pear-tree`
+- From: `2022-01-01T00:00:00.000Z`
+
+First, set your API credentials:
+
+```sh
+export SMB_BASE_URL=<YOUR BASE URL>
+export SMB_API_KEY=<YOUR API KEY>
+```
+
+And then execute the command with the relevant options set:
+
+```sh
+node dist/cli.js \
+   --site norwich-pear-tree \
+   --from '2022-01-01T00:00:00.000Z'
+```
+
+Output:
+
+```txt
+Successfully forwarded 10 outages
 ```

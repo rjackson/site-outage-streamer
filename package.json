@@ -20,6 +20,8 @@
     "watch-ts": "tsc -w"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "^9.4.1",
+    "commander": "^9.4.1",
     "node-fetch": "^2.6.7"
   }
 }
